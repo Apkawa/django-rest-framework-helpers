@@ -1,17 +1,22 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+import warnings
 from django import forms
 
-from django.template.backends import jinja2
-
-JINJA2_TEMPLATE_CLASSES = (jinja2.Template,)
+JINJA2_TEMPLATE_CLASSES = tuple()
 try:
-    from django_jinja.backend import Template as JinjaTemplate
+    from django.template.backends import jinja2
 
-    JINJA2_TEMPLATE_CLASSES += (JinjaTemplate,)
+    JINJA2_TEMPLATE_CLASSES += (jinja2.Template,)
+    try:
+        from django_jinja.backend import Template as JinjaTemplate
+
+        JINJA2_TEMPLATE_CLASSES += (JinjaTemplate,)
+    except ImportError:
+        pass
 except ImportError:
-    pass
+    warnings.warn("Need jinja2 package", ImportWarning)
 
 import django_filters
 

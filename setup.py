@@ -18,12 +18,8 @@ setup(
     zip_safe=False,
     install_requires=[
         'django>=1.8,<1.11',
-        'djangorestframework',
+        'djangorestframework>=3,<=4',
         'django-filter',
-        'python-dateutil',
-        'jinja2',
-        'django-jinja',
-        'easy-thumbnails',
     ],
     classifiers=[
         'Development Status :: Pre Alpha',

@@ -1,15 +1,15 @@
 # coding: utf-8
 from __future__ import unicode_literals
+import warnings
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 try:
-    from phonenumbers import PhoneNumber, format_number
+    from phonenumbers import PhoneNumber, format_number, PhoneNumberFormat
     from phonenumber_field.phonenumber import to_python
     from phonenumber_field.validators import validate_international_phonenumber
-    from phonenumbers import PhoneNumberFormat
 
 
     class PhoneNumberField(serializers.CharField):
@@ -29,4 +29,4 @@ try:
                 return format_number(value, PhoneNumberFormat.INTERNATIONAL)
             return value
 except ImportError:
-    pass
+    warnings.warn("Need django-phonenumber-field and phonenumbers package", ImportWarning)

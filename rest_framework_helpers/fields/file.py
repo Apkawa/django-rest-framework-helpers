@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 
 import base64
 
+import warnings
 from django.core.files.base import ContentFile
-from easy_thumbnails.exceptions import InvalidImageFormatError
-from easy_thumbnails.files import ThumbnailerFieldFile
 from rest_framework import serializers
 
 from .mixins import AbsoluteUrlMixin
@@ -34,23 +33,6 @@ class MethodAbsoluteURIFileField(serializers.SerializerMethodField, AbsoluteUrlM
         return self._to_absolute(value)
 
 
-class EasyThumbnailAbsoluteFileField(AbsoluteURIFileField):
-    def __init__(self, *args, **kwargs):
-        self.thumbnail_field = kwargs.pop('thumbnail_field', None)
-        super(EasyThumbnailAbsoluteFileField, self).__init__(*args, **kwargs)
-
-    def to_representation(self, value):
-        if not value:
-            return None
-        thumbnail_obj = value
-        if self.thumbnail_field and isinstance(value, ThumbnailerFieldFile):
-            try:
-                thumbnail_obj = value[self.thumbnail_field]
-            except InvalidImageFormatError:
-                return None
-        return super(EasyThumbnailAbsoluteFileField, self).to_representation(thumbnail_obj)
-
-
 class Base64FileField(AbsoluteURIFileField):
     def to_internal_value(self, data):
         if isinstance(data, basestring):
@@ -67,3 +49,27 @@ class Base64FileField(AbsoluteURIFileField):
                 imgstr = spl_data[0]
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
         return super(Base64FileField, self).to_internal_value(data)
+
+
+try:
+    from easy_thumbnails.exceptions import InvalidImageFormatError
+    from easy_thumbnails.files import ThumbnailerFieldFile
+
+
+    class EasyThumbnailAbsoluteFileField(AbsoluteURIFileField):
+        def __init__(self, *args, **kwargs):
+            self.thumbnail_field = kwargs.pop('thumbnail_field', None)
+            super(EasyThumbnailAbsoluteFileField, self).__init__(*args, **kwargs)
+
+        def to_representation(self, value):
+            if not value:
+                return None
+            thumbnail_obj = value
+            if self.thumbnail_field and isinstance(value, ThumbnailerFieldFile):
+                try:
+                    thumbnail_obj = value[self.thumbnail_field]
+                except InvalidImageFormatError:
+                    return None
+            return super(EasyThumbnailAbsoluteFileField, self).to_representation(thumbnail_obj)
+except ImportError:
+    warnings.warn("EasyThumbnailAbsoluteFileField need easy-thumbnails package", ImportWarning)
