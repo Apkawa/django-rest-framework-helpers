@@ -1,0 +1,5 @@
+Django>=1.8,<1.11
+djangorestframework
+django-filters
+jinja2
+python-dateutil
