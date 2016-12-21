@@ -23,9 +23,13 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.admin',
 
-    'easy_thumbnails',
     'tests',
 ]
+try:
+    import easy_thumbnails
+    INSTALLED_APPS.append('easy_thumbnails')
+except ImportError:
+    pass
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
